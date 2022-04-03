@@ -90,13 +90,15 @@ exports.SignIn = async(req, res) => {
     User.find({username})
     .then((user) => {
        if(user){
+        
            const hashedPassword = user[0].password;
            bcrypt.compare(password, hashedPassword)
            .then((result => {
                if(result){
                 res.json({
                     status: "SUCCESS",
-                    message: "User found"
+                    message: "User found",
+                    user: user[0]
                 })
                }else{
                 res.json({
