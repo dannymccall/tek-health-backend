@@ -90,16 +90,19 @@ exports.SignIn = async(req, res) => {
     User.find({username})
     .then((user) => {
        if(user){
-        
            const hashedPassword = user[0].password;
            bcrypt.compare(password, hashedPassword)
            .then((result => {
                if(result){
-                res.json({
-                    status: "SUCCESS",
-                    message: "User found",
-                    user: user[0]
-                })
+                   user[0].userStatus = "online";
+                   user[0].save()
+                   .then(
+                       res.json({
+                           status: "SUCCESS",
+                           message: "User found",
+                           user: user[0]
+                       })
+                   )
                }else{
                 res.json({
                     status: "FAILED",
@@ -120,6 +123,21 @@ exports.SignIn = async(req, res) => {
         res.json({
             status: "FAILED",
             message: "Invalid Username or Password"
+        })
+    })
+}
+
+exports.Logout = (req, res) => {
+    const username = req.body.username;
+    User.find(username)
+    .then(user => {
+        user[0].userStatus = 'offline';
+        res.json({
+            status: 'SUCCESS',
+        })
+    }).catch(()=> {
+        res.json({
+            status: 'FAILED',
         })
     })
 }

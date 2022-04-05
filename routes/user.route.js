@@ -9,6 +9,7 @@ router.post('/signup', userController.SignUp);
 
 router.post('/signin', userController.SignIn);
 
+router.post('logout', userController.Logout);
 
 
 module.exports = router

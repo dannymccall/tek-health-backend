@@ -24,6 +24,10 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    userStatus: {
+        type: String,
+        default: 'offline'
+    }
 },
 {
     timestamps:true
