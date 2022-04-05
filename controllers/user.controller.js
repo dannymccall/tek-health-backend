@@ -9,7 +9,7 @@ exports.SignUp = (req, res) => {
         username =username.trim();
         password = password.trim();
         dateOfBirth = dateOfBirth.trim();
-        typeOfUser = email.trim();
+        typeOfUser = typeOfUser.trim();
         console.log(email)
         if(email == '' || username=="" || password ==""||dateOfBirth==""||typeOfUser==""){
             res.json({
