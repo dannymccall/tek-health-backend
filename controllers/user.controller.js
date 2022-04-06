@@ -129,12 +129,15 @@ exports.SignIn = async(req, res) => {
 
 exports.Logout = (req, res) => {
     const username = req.body.username;
-    User.find(username)
+    User.find({username})
     .then(user => {
+        console.log(user[0])
         user[0].userStatus = 'offline';
-        res.json({
+        user[0].save()
+        .then( res.json({
             status: 'SUCCESS',
-        })
+        }))
+       
     }).catch(()=> {
         res.json({
             status: 'FAILED',
