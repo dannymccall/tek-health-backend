@@ -148,10 +148,10 @@ exports.Logout = (req, res) => {
 }
 
 exports.getDoctors = (req, res) => {
-    User.find({typeOfUser: 'typeOfUser'})
+    Doctor.find({typeOfUser: 'Doctor'})
     .then(value => {
         res.json({
-            status: 'FAILED',
+            status: 'SUCCESS',
             data: value
         })
     })
