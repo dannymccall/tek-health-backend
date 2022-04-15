@@ -1,24 +1,25 @@
-const User = require('../model/user.model')
+const Doctor = require('../model/doctor.model')
 const bcrypt = require('bcryptjs');
 
 
 exports.SignUp = (req, res) => {
     try {
-        let {email, username, password, dateOfBirth, typeOfUser} = req.body;
+        let {email, username, password, dateOfBirth, typeOfUser, specification} = req.body;
         email = email.trim();
         username =username.trim();
         password = password.trim();
         dateOfBirth = dateOfBirth.trim();
         typeOfUser = typeOfUser.trim();
+        specification = specification.trim()
         console.log(email)
-        if(email == '' || username=="" || password ==""||dateOfBirth==""||typeOfUser==""){
+        if(email == '' || username=="" || password ==""||dateOfBirth==""||typeOfUser=="" || specification ==""){
             res.json({
                 status: 'FAILED',
                 message: "Empty input fields"
             })
         }else{
             console.log(email)
-            User.find({email})
+            Doctor.find({email})
             .then(user => {
                 console.log(user)
                 if(user.length > 0){
@@ -27,7 +28,7 @@ exports.SignUp = (req, res) => {
                         message: "Email already exists"
                     })
                 }else{
-                    User.find({username})
+                    Doctor.find({username})
                     .then(result => {
                         if(result.length > 0){
                             res.json({
@@ -39,15 +40,16 @@ exports.SignUp = (req, res) => {
                     bcrypt.hash(password, 10)
                     .then((hashedPassword) => {
                         console.log('hello')
-                        const newUser = new User({
+                        const newDoctor = new Doctor({
                             email,
                             username,
                             password: hashedPassword,
                             dateOfBirth,
-                            typeOfUser
+                            typeOfUser,
+                            specification
                         })
-                        console.log(newUser)
-                        newUser.save()
+                        console.log(newDoctor)
+                        newDoctor.save()
                         .then(() => res.json({
                             status: "SUCCESS",
                             message: "Signup Successfull"
@@ -87,7 +89,7 @@ exports.SignIn = async(req, res) => {
         })
     }
     console.log(`${username} ${password}`)
-    User.find({username})
+    Doctor.find({username})
     .then((user) => {
        if(user){
            const hashedPassword = user[0].password;
@@ -141,6 +143,16 @@ exports.Logout = (req, res) => {
     }).catch(()=> {
         res.json({
             status: 'FAILED',
+        })
+    })
+}
+
+exports.getDoctors = (req, res) => {
+    User.find({typeOfUser: 'typeOfUser'})
+    .then(value => {
+        res.json({
+            status: 'FAILED',
+            data: value
         })
     })
 }
