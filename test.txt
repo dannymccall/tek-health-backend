@@ -1,0 +1,12 @@
+POST http://localhost:5000/add-appointment
+
+content-Type: application/json
+
+{
+    "specification":"Infectious Disease Specialist",
+    "patientName":"ivan",
+    "userId":"000090",
+    "time":"8:30am to 9:30am",
+    "dateOfAppointment":"2016-05-15",
+    "username":"baiden"
+}
