@@ -19,14 +19,19 @@ const appointmentSchema = new Schema({
         type: String,
         required: true
     },
-    datedateOfAppointment:{
+    dateOfAppointment:{
         type: Date,
         required: true
     },
     specification:{
         type: String,
         required: true
-    }
+    }, 
+    reason:{
+        type: String,
+        required: true
+    }, 
+    
 })
 
 module.exports = mongoose.model('Appointments', appointmentSchema)

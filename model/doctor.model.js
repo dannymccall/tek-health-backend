@@ -9,7 +9,8 @@ const doctorSchema = new Schema({
     username: {
         type: String,
         required: true,
-        max: 15
+        max: 15,
+        unique: true
     },
     password: {
         type: String,
