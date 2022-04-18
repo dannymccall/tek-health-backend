@@ -17,156 +17,47 @@ exports.addAppointment = (req, res) => {
                 message: "Empty input fields"
             })
         }else{
-            Appointment.find({userId})
+            Appointment.find({userId, time, dateOfAppointment})
             .then((data) => {
-                if(data.length){
-                    Appointment.find({dateOfAppointment})
-                    .then((result) => {
-                        if(result.length){
-                            Appointment.find({time})
-                            .then((appointment) => {
-                               if(appointment.length){
-                                res.json({
-                                    status: 'FAILED',
-                                    message: "Please you can't book appointments at the same date and time"
-                                })
-                               }else{
-                               Appointment.find({doctorName})
-                               .then((username) => {
-                                   if(username){
-                                        Appointment.find({dateOfAppointment})
-                                        .then(dateOfAppointment => {
-                                            if(dateOfAppointment){
-                                                Appointment.find({time})
-                                                .then(time => {
-                                                    if(time){
-                                                        res.json({
-                                                            status: 'FAILED',
-                                                            message: "Doctor has already been booked for the same date and time"
-                                                        })
-                                                    }else{
-                                                        const newAppointment = new Appointment({
-                                                            userId,
-                                                            patientName,
-                                                            doctorName,
-                                                            time,
-                                                            dateOfAppointment,
-                                                            specification,
-                                                            reason
-                                                       })
-                                                      newAppointment.save()
-                                                      .then(() =>{
-                                                        res.json({
-                                                           status: 'SUCCESS',
-                                                           message: 'Appointment booked successfully' 
-                                                        })
-                                                    }).catch(() => {
-                                                        res.json({
-                                                            status: 'FAILED',
-                                                            message: 'Something happened' 
-                                                         })
-                                                    })
-                                                    }
-                                                })
-                                            }else{
-                                                const newAppointment = new Appointment({
-                                                    userId,
-                                                    patientName,
-                                                    doctorName,
-                                                    time,
-                                                    dateOfAppointment,
-                                                    specification,
-                                                    reason
-                                               })
-                                              newAppointment.save()
-                                              .then(() =>{
-                                                res.json({
-                                                   status: 'SUCCESS',
-                                                   message: 'Appointment booked successfully' 
-                                                })
-                                            }).catch(() => {
-                                                res.json({
-                                                    status: 'FAILED',
-                                                    message: 'Something happened' 
-                                                 })
-                                            })
-                                            }
-                                        })
-                                   }else{
-                                const newAppointment = new Appointment({
-                                userId,
-                                patientName,
-                                doctorName,
-                                time,
-                                dateOfAppointment,
-                                specification,
-                                reason
-                           })
-                          newAppointment.save()
-                          .then(() =>{
-                            res.json({
-                               status: 'SUCCESS',
-                               message: 'Appointment booked successfully' 
-                            })
-                        }).catch(() => {
-                            res.json({
-                                status: 'FAILED',
-                                message: 'Something happened' 
-                             })
-                        })
-                                   }
-                               })
-                               }
-                            })
-                        }else{
-                            const newAppointment = new Appointment({
-                                userId,
-                                patientName,
-                                doctorName,
-                                time,
-                                dateOfAppointment,
-                                specification,
-                                reason
-                           })
-                          newAppointment.save()
-                          .then(() =>{
-                            res.json({
-                               status: 'SUCCESS',
-                               message: 'Appointment booked successfully' 
-                            })
-                        }).catch(() => {
-                            res.json({
-                                status: 'FAILED',
-                                message: 'Something happened' 
-                             })
-                        })
-                        }
-                    })
-                }else{
-                    const newAppointment = new Appointment({
-                        userId,
-                        patientName,
-                        doctorName,
-                        time,
-                        dateOfAppointment,
-                        specification,
-                        reason
+               if(data.length){
+                   res.json({
+                       status: 'FAILED',
+                       message: "You can't book an appointment on the same date and time"
                    })
-                  newAppointment.save()
-                  .then(() =>{
-                    res.json({
-                       status: 'SUCCESS',
-                       message: 'Appointment booked successfully' 
+               }else{
+                Appointment.find({doctorName, time, dateOfAppointment})
+                .then((result) => {
+                    if(result.length){
+                        res.json({
+                            status: 'FAILED',
+                            message: "Doctor has already been booked on the date and time you choose"
+                        })
+                    }else{
+                        const newAppointment = new Appointment({
+                            userId,
+                            patientName,
+                            doctorName,
+                            time,
+                            dateOfAppointment,
+                            specification,
+                            reason
+                       })
+                      newAppointment.save()
+                      .then(() =>{
+                        res.json({
+                           status: 'SUCCESS',
+                           message: 'Appointment booked successfully' 
+                        })
+                    }).catch(() => {
+                        res.json({
+                            status: 'FAILED',
+                            message: 'Something happened' 
+                         })
                     })
-                }).catch(() => {
-                    res.json({
-                        status: 'FAILED',
-                        message: 'Something happened' 
-                     })
+                    }
                 })
-                }
+               }
             })
-                   
         }
     } catch (error) {
         res.json({
