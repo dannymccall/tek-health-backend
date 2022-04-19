@@ -75,7 +75,10 @@ exports.getAppointments = (req, res) => {
         console.log(userId)
         Appointment.find({userId})
         .then(appointments => {
-            res.json(appointments)
+            res.json({
+                status:'SUCCESS',
+                appointments
+            })
         })
         .catch(() => {
             res.json('Something happened')
