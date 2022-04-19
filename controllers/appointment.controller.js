@@ -68,19 +68,20 @@ exports.addAppointment = (req, res) => {
 }
 
 let userId;
-exports.getId = (req, res) => {
-    userId = req.body._id;
-    console.log(id);
-}
 
 exports.getAppointments = (req, res) => {
-    const userId = req.params._id;
-    console.log(userId)
-    Appointment.find({userId})
-    .then(appointments => {
-        res.json(appointments)
-    })
-    .catch(() => {
-        res.json('Something happened')
-    })
+    try {
+        const userId = req.params._id;
+        console.log(userId)
+        Appointment.find({userId})
+        .then(appointments => {
+            res.json(appointments)
+        })
+        .catch(() => {
+            res.json('Something happened')
+        })
+        
+    } catch (error) {
+        res.json(error.message)
+    }
 }
