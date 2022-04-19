@@ -17,5 +17,6 @@ router.post('/doctor-signin', doctorController.SignIn);
 router.get('/get-doctors', doctorController.getDoctors);
 router.post('/doctor-logout', doctorController.Logout);
 router.post('/add-appointment', appointmentController.addAppointment);
-router.get('/get-appointments', appointmentController.getAppointments);
+router.post('/userId', appointmentController.getId);
+router.get('/get-appointments/:_id', appointmentController.getAppointments);
 module.exports = router

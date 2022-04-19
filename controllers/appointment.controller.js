@@ -67,8 +67,16 @@ exports.addAppointment = (req, res) => {
     }
 }
 
+let userId;
+exports.getId = (req, res) => {
+    userId = req.body._id;
+    console.log(id);
+}
+
 exports.getAppointments = (req, res) => {
-    Appointment.find()
+    const userId = req.params._id;
+    console.log(userId)
+    Appointment.find({userId})
     .then(appointments => {
         res.json(appointments)
     })
