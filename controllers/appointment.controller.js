@@ -66,3 +66,13 @@ exports.addAppointment = (req, res) => {
         })
     }
 }
+
+exports.getAppointments = (req, res) => {
+    Appointment.find()
+    .then(appointments => {
+        res.json(appointments)
+    })
+    .catch(() => {
+        res.json('Something happened')
+    })
+}
