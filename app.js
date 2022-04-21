@@ -1,24 +1,25 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
 const app = express();
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const route = require('./routes/route');
+const route = require("./routes/route");
 app.use(cors());
-app.use(express.json())
+app.use(express.json());
 const PORT = process.env.PORT || 5000;
-app.get('/', (req, res) => {
-    res.send('hello')
-})
+app.get("/", (req, res) => {
+  res.send("hello");
+});
 app.use(route);
-const MONGODB_URI = "mongodb+srv://palmer:Academy1@cluster0.ndcp5.mongodb.net/tekHealth?retryWrites=true&w=majority"
-mongoose.connect(MONGODB_URI)
-.then(result => {
+const MONGODB_URI =
+  "mongodb+srv://palmer:Academy1@cluster0.ndcp5.mongodb.net/tekHealth?retryWrites=true&w=majority";
+mongoose
+  .connect(MONGODB_URI)
+  .then((result) => {
     app.listen(PORT, () => {
-        console.log('connected')
-    })
-})
-.catch(err => {
-    console.log(err)
-})
-
+      console.log("connected");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
