@@ -106,3 +106,19 @@ exports.getAppointments = (req, res) => {
     res.json(error.message);
   }
 };
+exports.getAllAppointments = (req, res) => {
+  try {
+    Appointment.find()
+      .then((appointments) => {
+        res.json({
+          status: "SUCCESS",
+          appointments,
+        });
+      })
+      .catch(() => {
+        res.json("Something happened");
+      });
+  } catch (error) {
+    res.json(error.message);
+  }
+};
