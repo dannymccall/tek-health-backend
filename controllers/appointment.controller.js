@@ -143,3 +143,25 @@ exports.getDoctorAppointments = (req, res) => {
     })
   }
 }
+
+exports.updateAppointments = (req, res) => {
+  try {
+    const doctorName = req.params.username;
+    Appointment.find({ doctorName })
+      .then((appointments) => {
+        appointments[0].appointmentStatus = "yes";
+        appointments[0].save()
+        .then(() => {
+          res.json('SUCCESS')
+        })
+      })
+      .catch(() => {
+        res.json("Something happened");
+      });
+  } catch (error) {
+    res.json({
+      status: 'FAILED',
+      message: 'something happened'
+    })
+  }
+}
