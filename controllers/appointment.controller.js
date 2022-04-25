@@ -122,3 +122,24 @@ exports.getAllAppointments = (req, res) => {
     res.json(error.message);
   }
 };
+
+exports.getDoctorAppointments = (req, res) => {
+  try {
+    const doctorName = req.params.username;
+    Appointment.find({ doctorName })
+      .then((appointments) => {
+        res.json({
+          status: "SUCCESS",
+          appointments,
+        });
+      })
+      .catch(() => {
+        res.json("Something happened");
+      });
+  } catch (error) {
+    res.json({
+      status: 'FAILED',
+      message: 'something happened'
+    })
+  }
+}
