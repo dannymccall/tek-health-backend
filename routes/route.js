@@ -5,7 +5,8 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 const doctorController = require("../controllers/doctor.controller");
 const appointmentController = require("../controllers/appointment.controller");
-const messageController = require('../controllers/message.controller')
+const messageController = require('../controllers/message.controller');
+const bloodController = require('../controllers/blood.controller');
 router.post("/signup", userController.SignUp);
 
 router.post("/signin", userController.SignIn);
@@ -22,4 +23,5 @@ router.get("/get-appointments/:_id", appointmentController.getAppointments);
 router.post('/send-message', messageController.postMessage);
 router.get('/doctor-message/:doctorId', messageController.getDoctorMessages);
 router.get('/patient-message/:patientId', messageController.getPatientMessages);
+router.post('/add-blood', bloodController.addBlood)
 module.exports = router;
