@@ -5,6 +5,7 @@ exports.addBlood = (req, res) => {
     let { quantity, selectBloodType } = req.body;
     quantity = quantity.toString().trim();
     selectBloodType = selectBloodType.trim();
+    let bloodCode = Math.floor(1000 + Math.random() * 9000);
     const bloodType = selectBloodType;
     if (quantity == "" || selectBloodType == "") {
       res.json({
@@ -30,6 +31,7 @@ exports.addBlood = (req, res) => {
           const newBlood = new Blood({
             bloodType: selectBloodType,
             quantity,
+            bloodCode
           });
           newBlood
             .save()
