@@ -1,5 +1,5 @@
 const Blood = require("../model/blood.model");
-
+const Orders = require("../model/orders.model");
 exports.addBlood = (req, res) => {
   try {
     let { quantity, selectBloodType } = req.body;
