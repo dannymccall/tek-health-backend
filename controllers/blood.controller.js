@@ -2,7 +2,7 @@ const Blood = require("../model/blood.model");
 const Orders = require("../model/orders.model");
 exports.addBlood = (req, res) => {
   try {
-    let { quantity, selectBloodType, username } = req.body;
+    let { quantity, selectBloodType } = req.body;
     quantity = quantity.toString().trim();
     selectBloodType = selectBloodType.trim();
     let bloodCode = Math.floor(1000 + Math.random() * 9000);
@@ -111,6 +111,11 @@ exports.orderForBlood = (req, res) => {
               newOrder.save();
             }
           });
+        }else{
+            res.json({
+                status: "FAILED",
+                message: `We have don't have such blood type in stock`,
+              });
         }
       });
     }
@@ -121,3 +126,13 @@ exports.orderForBlood = (req, res) => {
     });
   }
 };
+
+exports.getBloodInStock = (req, res) => {
+    Blood.find()
+    .then(data => {
+        res.json({
+            status: 'SUCCESS',
+            data
+        })
+    })
+}
