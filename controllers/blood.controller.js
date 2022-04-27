@@ -1,5 +1,5 @@
 const Blood = require("../model/blood.model");
-const Orders = require('../model/orders.model');
+
 exports.addBlood = (req, res) => {
   try {
     let { quantity, selectBloodType } = req.body;
@@ -103,12 +103,6 @@ exports.orderForBlood = (req, res) => {
                 });
               });
               console.log(username);
-              const newOrder = new Orders({
-                doctorName: username,
-                bloodType,
-                quantity,
-              });
-              newOrder.save();
             }
           });
         }else{
