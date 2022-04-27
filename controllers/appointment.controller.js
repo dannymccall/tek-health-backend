@@ -165,3 +165,4 @@ exports.updateAppointments = (req, res) => {
     })
   }
 }
+
