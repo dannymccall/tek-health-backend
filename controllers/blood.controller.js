@@ -28,6 +28,7 @@ exports.addBlood = (req, res) => {
             });
           });
         } else {
+          res.json(bloodCode);
           const newBlood = new Blood({
             bloodType: selectBloodType,
             quantity,
@@ -105,11 +106,11 @@ exports.orderForBlood = (req, res) => {
               console.log(username);
             }
           });
-        }else{
-            res.json({
-                status: "FAILED",
-                message: `We have don't have such blood type in stock`,
-              });
+        } else {
+          res.json({
+            status: "FAILED",
+            message: `We have don't have such blood type in stock`,
+          });
         }
       });
     }
@@ -122,11 +123,10 @@ exports.orderForBlood = (req, res) => {
 };
 
 exports.getBloodInStock = (req, res) => {
-    Blood.find()
-    .then(data => {
-        res.json({
-            status: 'SUCCESS',
-            data
-        })
-    })
-}
+  Blood.find().then((data) => {
+    res.json({
+      status: "SUCCESS",
+      data,
+    });
+  });
+};
