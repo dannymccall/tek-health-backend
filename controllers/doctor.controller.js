@@ -165,12 +165,4 @@ exports.getDoctors = (req, res) => {
   });
 };
 
-exports.getBloodInStock = (req, res) => {
-  Blood.find().then((data) => {
-    res.json({
-      status: "SUCCESS",
-      data,
-    });
-  });
-};
 
