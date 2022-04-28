@@ -130,6 +130,3 @@ exports.getBloodInStock = (req, res) => {
   });
 };
 
-exports.sayHello = (req, res) => {
-  res.json('Hello')
-}
