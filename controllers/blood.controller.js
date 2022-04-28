@@ -1,6 +1,6 @@
 const Blood = require("../model/blood.model");
 
-exports.addBlood = (req, res) => {
+exports.addBlood = (req, res, next) => {
   try {
     let { quantity, selectBloodType } = req.body;
     quantity = quantity.toString().trim();
@@ -28,7 +28,6 @@ exports.addBlood = (req, res) => {
             });
           });
         } else {
-          res.json(bloodCode);
           const newBlood = new Blood({
             bloodType: selectBloodType,
             quantity,
@@ -123,7 +122,7 @@ exports.orderForBlood = (req, res) => {
 };
 
 exports.getBloodInStock = (req, res) => {
-  Blood.find().then((data) => {
+  Blood.find({bloodType}).then((data) => {
     res.json({
       status: "SUCCESS",
       data,
