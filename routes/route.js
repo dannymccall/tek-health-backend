@@ -7,6 +7,8 @@ const doctorController = require("../controllers/doctor.controller");
 const appointmentController = require("../controllers/appointment.controller");
 const messageController = require("../controllers/message.controller");
 const bloodController = require("../controllers/blood.controller");
+const OrderController = require('../controllers/orders.controller');
+
 router.post("/signup", userController.SignUp);
 
 router.post("/signin", userController.SignIn);
@@ -27,4 +29,8 @@ router.post("/send-message", messageController.postMessage);
 router.get("/doctor-message/:doctorId", messageController.getDoctorMessages);
 router.get("/patient-message/:patientId", messageController.getPatientMessages);
 router.post("/add-blood", bloodController.addBlood);
+router.post("/blood-order", bloodController.orderForBlood);
+router.post("/add-orders", OrderController.addOrder);
+router.get("/blood-stock", bloodController.getBloodInStock);
+
 module.exports = router;

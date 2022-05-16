@@ -8,6 +8,10 @@ const bloodSchema = new mongoose.Schema({
     quantity:{
         type: Number,
         required: true
+    },
+    bloodCode: {
+        type: String,
+        required: true 
     }
 },
 {
