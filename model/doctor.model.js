@@ -34,6 +34,10 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
     },
+    priorityCode: {
+      type: String,
+      default:'0'
+  },
   },
   {
     timestamps: true,
