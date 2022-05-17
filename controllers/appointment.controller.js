@@ -86,7 +86,7 @@ exports.addAppointment = (req, res) => {
   }
 };
 
-let userId;
+
 
 exports.getAppointments = (req, res) => {
   try {
@@ -146,8 +146,8 @@ exports.getDoctorAppointments = (req, res) => {
 
 exports.updateAppointments = (req, res) => {
   try {
-    const doctorName = req.params.username;
-    Appointment.find({ doctorName })
+    const _id = req.params.appointmentId;
+    Appointment.find({ _id })
       .then((appointments) => {
         appointments[0].appointmentStatus = "yes";
         appointments[0].save()

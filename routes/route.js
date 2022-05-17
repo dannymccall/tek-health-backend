@@ -7,7 +7,7 @@ const doctorController = require("../controllers/doctor.controller");
 const appointmentController = require("../controllers/appointment.controller");
 const messageController = require("../controllers/message.controller");
 const bloodController = require("../controllers/blood.controller");
-const OrderController = require('../controllers/orders.controller');
+const OrderController = require("../controllers/orders.controller");
 
 router.post("/signup", userController.SignUp);
 
@@ -23,8 +23,14 @@ router.post("/add-appointment", appointmentController.addAppointment);
 
 router.get("/get-appointments/:_id", appointmentController.getAppointments);
 router.get("/get-all-appointments", appointmentController.getAllAppointments);
-router.get('/doctor-appointments/:username', appointmentController.getDoctorAppointments);
-router.post('/update-appointments/:username', appointmentController.updateAppointments);
+router.get(
+  "/doctor-appointments/:username",
+  appointmentController.getDoctorAppointments
+);
+router.post(
+  "/update-appointments/:appointmentId",
+  appointmentController.updateAppointments
+);
 router.post("/send-message", messageController.postMessage);
 router.get("/doctor-message/:doctorId", messageController.getDoctorMessages);
 router.get("/patient-message/:patientId", messageController.getPatientMessages);
