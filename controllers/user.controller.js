@@ -1,7 +1,8 @@
 const User = require("../model/user.model");
 const bcrypt = require("bcryptjs");
 
-exports.SignUp = (req, res) => {
+//REGISTERING A USER 
+exports.SignUp = async (req, res) => {
   try {
     let { email, username, password, dateOfBirth, typeOfUser } = req.body;
     email = email.trim();
@@ -9,145 +10,83 @@ exports.SignUp = (req, res) => {
     password = password.trim();
     dateOfBirth = dateOfBirth.trim();
     typeOfUser = typeOfUser.trim();
-    console.log(email);
-    if (
-      email == "" ||
-      username == "" ||
-      password == "" ||
-      dateOfBirth == "" ||
-      typeOfUser == ""
-    ) {
-      res.json({
-        status: "FAILED",
-        message: "Empty input fields",
-      });
-    } else {
+
+    //CHECKING FOR EMPTY FIELDS 
+    if (email == "" ||username == "" || password == "" ||dateOfBirth == "" || typeOfUser == "") 
+     return res.status(400).json({ status: "FAILED", message: "Empty input fields", })
       console.log(email);
-      User.find({ email }).then((user) => {
-        console.log(user);
-        if (user.length > 0) {
-          res.json({
-            status: "FAILED",
-            message: "Email already exists",
-          });
-        } else {
-          User.find({ username }).then((result) => {
-            if (result.length > 0) {
-              res.json({
-                status: "FAILED",
-                message: "Username already exists",
-              });
-            }
-          });
-          bcrypt
-            .hash(password, 10)
-            .then((hashedPassword) => {
-              console.log("hello");
-              const newUser = new User({
-                email,
-                username,
-                password: hashedPassword,
-                dateOfBirth,
-                typeOfUser,
-              });
-              console.log(newUser);
-              newUser
-                .save()
-                .then(() =>
-                  res.json({
-                    status: "SUCCESS",
-                    message: "Signup Successfull",
-                  })
-                )
-                .catch(() =>
-                  res.json({
-                    status: "FAILED",
-                    message: "Error while hashing password",
-                  })
-                );
-            })
-            .catch(() =>
-              res.json({
-                status: "FAILED",
-                message: "Error occurred",
-              })
-            );
-        }
-      });
-    }
-  } catch (error) {
-    res.json({
-      status: "FAILED",
-      message: error.message,
+    
+    //CHECKING FOR EXISTING EMAIL
+    const emailExits = await User.findOne({ email })
+    if(emailExits) return res.status(400).json({ status: "FAILED", message: "Email already exists",})
+
+    //CHECKING FOR EXISTING USERNAME
+    let userExits = await  User.findOne({ username })
+    if(userExits) return res.status(400).json({ status: "FAILED", message: "Username already exists",})
+
+    console.log(dateOfBirth)
+    //HASHING PASSWORDS
+    const salt = await bcrypt.genSalt(10);
+    let hashedPassword = await bcrypt.hash(password, salt);
+ 
+    //CREATING NEW USER
+    const newUser = new User({
+      email,
+      username,
+      password: hashedPassword,
+      dateOfBirth,
+      typeOfUser,
     });
+    let savedUser = await newUser.save()
+    return res.status(200).json({status: "SUCCESS",message: "Signup Successfull", savedUser})
+  } catch (error) {
+   res.status(400).json({ status: "FAILED", message: error.message,})
   }
 };
 
+//LOGGING IN A USER 
 exports.SignIn = async (req, res) => {
   let { username, password } = req.body;
   username = username.trim();
   password = password.trim();
-  if (username == "" || password == "") {
-    res.json({
-      status: "FAILED",
-      message: "Empty Input Fields",
-    });
-  }
+
+  //CHECKING FOR EMPTY PASSWORDS
+  if (username == "" || password == "") 
+  return res.status(400).json({ status: "FAILED",message: "Empty Input Fields"})
   console.log(`${username} ${password}`);
-  User.find({ username })
-    .then((user) => {
-      if (user) {
-        const hashedPassword = user[0].password;
-        bcrypt
-          .compare(password, hashedPassword)
-          .then((result) => {
-            if (result) {
-              user[0].userStatus = "online";
-              user[0].save().then(
-                res.json({
-                  status: "SUCCESS",
-                  message: "User found",
-                  user: user[0],
-                })
-              );
-            } else {
-              res.json({
-                status: "FAILED",
-                message: "Invalid Username or Password",
-              });
-            }
-          })
-          .catch();
-      } else {
-        res.json({
-          status: "FAILED",
-          message: "Invalid Username or Password",
-        });
-      }
-    })
-    .catch(() => {
-      res.json({
-        status: "FAILED",
-        message: "Invalid Username or Password",
-      });
-    });
+
+  //FINDING IF THE USER EXITS
+  let user = await User.findOne({ username })
+  if(!user) return res.status(400).json({ status: "FAILED", message: "Invalid Username or Password",})
+
+  //COMPARING PASSWORDS 
+  let hashedPassword = user.password
+  let validPass = await bcrypt.compare(password, hashedPassword)
+
+  //THROWING AN ERROR IF PASSWORD DOES NOT MATCH 
+  if(!validPass) return res.status(400).json({ status: "FAILED", message: "Invalid Username or Password" })
+
+  user.userStatus = "online"
+  let updateUserStatus = await user.save()
+  if(updateUserStatus) return res.status(200).json({ status: "SUCCESS",message: "User found", user: user,})
+
 };
 
-exports.Logout = (req, res) => {
-  const username = req.body.username;
-  User.find({ username })
-    .then((user) => {
-      console.log(user[0]);
-      user[0].userStatus = "offline";
-      user[0].save().then(
-        res.json({
-          status: "SUCCESS",
-        })
-      );
-    })
-    .catch(() => {
-      res.json({
-        status: "FAILED",
-      });
-    });
+//LOGGING OUT THE USER
+exports.Logout = async (req, res) => {
+
+  try {
+    const username = req.body.username;
+
+    //FINDING THE USER
+    let user = await User.findOne({ username })
+
+    //UPDATING THE USER STATUS 
+     user.userStatus = "offline";
+    let logoutOut =  user.save()
+
+    if(logoutOut) res.status(200).json({status: "SUCCESS", user})
+  } catch (error) {
+    res.status(400).json({status: "FAILED"})
+  }
 };

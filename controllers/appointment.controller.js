@@ -1,16 +1,9 @@
 const Appointment = require("../model/appointment.model");
 
-exports.addAppointment = (req, res) => {
+//MAKE APPOINTMENT
+exports.addAppointment = async(req, res) => {
   try {
-    let {
-      specification,
-      patientName,
-      userId,
-      time,
-      dateOfAppointment,
-      username,
-      reason,
-    } = req.body;
+    let {specification,patientName,userId,time,dateOfAppointment,username,reason,} = req.body;
     console.log(dateOfAppointment);
     specification = specification.trim();
     patientName = patientName.trim();
@@ -19,65 +12,33 @@ exports.addAppointment = (req, res) => {
     dateOfAppointment = dateOfAppointment.trim();
     doctorName = username.trim();
     reason = reason.trim();
-    if (
-      (specification == "" ||
-        patientName == "" ||
-        userId == "" ||
-        time == "" ||
-        dateOfAppointment == "" ||
-        doctorName == "",
-      reason == "")
-    ) {
-      res.json({
-        status: "FAILED",
-        message: "Empty input fields",
-      });
-    } else {
-      Appointment.find({ userId, time, dateOfAppointment }).then((data) => {
-        if (data.length) {
-          res.json({
-            status: "FAILED",
-            message: "You can't book an appointment on the same date and time",
-          });
-        } else {
-          Appointment.find({ doctorName, time, dateOfAppointment }).then(
-            (result) => {
-              if (result.length) {
-                res.json({
-                  status: "FAILED",
-                  message:
-                    "Doctor has already been booked on the date and time you choose",
-                });
-              } else {
-                const newAppointment = new Appointment({
-                  userId,
-                  patientName,
-                  doctorName,
-                  time,
-                  dateOfAppointment,
-                  specification,
-                  reason,
-                });
-                newAppointment
-                  .save()
-                  .then(() => {
-                    res.json({
-                      status: "SUCCESS",
-                      message: "Appointment booked successfully",
-                    });
-                  })
-                  .catch(() => {
-                    res.json({
-                      status: "FAILED",
-                      message: "Something happened",
-                    });
-                  });
-              }
-            }
-          );
-        }
-      });
-    }
+
+    //CHECKING FOR EMPTY FIELDS
+    if (specification == "" ||patientName == "" ||userId == "" ||time == "" ||dateOfAppointment == "" ||doctorName == "",reason == "")
+     return res.status(400).json({status: "FAILED",message: "Empty input fields",});
+
+    //CHECKING IF USER ALREADY HAS AN APPOINTMENT ON THAT PARTICULAR DATE AND TIME 
+    let appointment = await Appointment.findOne({ userId, time, dateOfAppointment })
+    if (appointment) return res.status(400).json({status: "FAILED",message: "You can't book an appointment on the same date and time",})
+        
+    //CHECKING IF DOCTOR ALREADY HAS AN APPOINTMENT ON THAT PARTICULAR DATE AND TIME 
+    let doctorAppointment = await Appointment.findOne({ doctorName, time, dateOfAppointment })
+    if (doctorAppointment) return res.status(400).json({status: "FAILED",message:"Doctor has already been booked on the date and time you chose",});
+    
+    //MAKING NEW APPOINGMENT
+    const newAppointment = new Appointment({
+      userId,
+      patientName,
+      doctorName,
+      time,
+      dateOfAppointment,
+      specification,
+      reason,
+    });
+
+    //SAVING APPOINTMENT
+    let savedAppointment = await newAppointment.save()
+    if(savedAppointment) return res.status(200).json({status: "SUCCESS",message: "Appointment booked successfully",savedAppointment});
   } catch (error) {
     res.json({
       status: "FAILED",
@@ -88,54 +49,34 @@ exports.addAppointment = (req, res) => {
 
 
 
-exports.getAppointments = (req, res) => {
+exports.getAppointments = async (req, res) => {
   try {
     const userId = req.params._id;
     console.log(userId);
-    Appointment.find({ userId })
-      .then((appointments) => {
-        res.json({
-          status: "SUCCESS",
-          appointments,
-        });
-      })
-      .catch(() => {
-        res.json("Something happened");
-      });
-  } catch (error) {
-    res.json(error.message);
-  }
-};
-exports.getAllAppointments = (req, res) => {
-  try {
-    Appointment.find()
-      .then((appointments) => {
-        res.json({
-          status: "SUCCESS",
-          appointments,
-        });
-      })
-      .catch(() => {
-        res.json("Something happened");
-      });
+
+    let appointments = await Appointment.find({ userId })
+    if(appointments) return res.status(200).json({status: "SUCCESS",appointments,});
   } catch (error) {
     res.json(error.message);
   }
 };
 
-exports.getDoctorAppointments = (req, res) => {
+
+exports.getAllAppointments = async (req, res) => {
+  try {
+    let appointments = await Appointment.find()
+    if(appointments) return res.json({status: "SUCCESS",appointments,});
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
+exports.getDoctorAppointments = async (req, res) => {
   try {
     const doctorName = req.params.username;
-    Appointment.find({ doctorName })
-      .then((appointments) => {
-        res.json({
-          status: "SUCCESS",
-          appointments,
-        });
-      })
-      .catch(() => {
-        res.json("Something happened");
-      });
+
+    let doctorAppointment = await Appointment.find({ doctorName })
+    if(doctorAppointment) return res.json({status: "SUCCESS",appointments:doctorAppointment});
   } catch (error) {
     res.json({
       status: 'FAILED',
@@ -144,20 +85,14 @@ exports.getDoctorAppointments = (req, res) => {
   }
 }
 
-exports.updateAppointments = (req, res) => {
+exports.updateAppointments = async(req, res) => {
   try {
     const _id = req.params.appointmentId;
-    Appointment.find({ _id })
-      .then((appointments) => {
-        appointments[0].appointmentStatus = "yes";
-        appointments[0].save()
-        .then(() => {
-          res.json('SUCCESS')
-        })
-      })
-      .catch(() => {
-        res.json("Something happened");
-      });
+    let appointment = await Appointment.find({ _id })
+    console.log(appointment)
+    appointment[0].appointmentStatus = "yes";
+    appointment = await appointment[0].save()
+    if(appointment) return res.status(200).json({status:'SUCCESS', appointment})
   } catch (error) {
     res.json({
       status: 'FAILED',

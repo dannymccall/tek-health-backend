@@ -1,7 +1,8 @@
 const Doctor = require("../model/doctor.model");
 const bcrypt = require("bcryptjs");
 
-exports.SignUp = (req, res) => {
+//REGISTERING A DOCTOR
+exports.SignUp =  async (req, res) => {
   try {
     let { email, username, password, dateOfBirth, typeOfUser, specification } =
       req.body;
@@ -11,74 +12,35 @@ exports.SignUp = (req, res) => {
     dateOfBirth = dateOfBirth.trim();
     typeOfUser = typeOfUser.trim();
     specification = specification.trim();
-    console.log(email);
-    if (
-      email == "" ||
-      username == "" ||
-      password == "" ||
-      dateOfBirth == "" ||
-      typeOfUser == "" ||
-      specification == ""
-    ) {
-      res.json({
-        status: "FAILED",
-        message: "Empty input fields",
-      });
-    } else {
+
+    //CHECKING FOR EMPTY FIELDS
+    if (email == "" ||username == "" ||password == "" ||dateOfBirth == "" ||typeOfUser == "" ||specification == "") 
+    return res.status(400).json({status: "FAILED",message: "Empty input fields",})
       console.log(email);
-      Doctor.find({ email }).then((user) => {
-        console.log(user);
-        if (user.length > 0) {
-          res.json({
-            status: "FAILED",
-            message: "Email already exists",
-          });
-        } else {
-          Doctor.find({ username }).then((result) => {
-            if (result.length > 0) {
-              res.json({
-                status: "FAILED",
-                message: "Username already exists",
-              });
-            }
-          });
-          bcrypt
-            .hash(password, 10)
-            .then((hashedPassword) => {
-              console.log("hello");
-              const newDoctor = new Doctor({
-                email,
-                username,
-                password: hashedPassword,
-                dateOfBirth,
-                typeOfUser,
-                specification,
-              });
-              console.log(newDoctor);
-              newDoctor
-                .save()
-                .then(() =>
-                  res.json({
-                    status: "SUCCESS",
-                    message: "Signup Successfull",
-                  })
-                )
-                .catch(() =>
-                  res.json({
-                    status: "FAILED",
-                    message: "Error while hashing password",
-                  })
-                );
-            })
-            .catch(() =>
-              res.json({
-                status: "FAILED",
-                message: "Error occurred",
-              })
-            );
-        }
-      });
-    }
+
+    //CHECKING IF EMAIL EXISTS 
+    let emailExits = await  Doctor.findOne({ email })
+    if(emailExits) return res.status(400).json({status: "FAILED",message: "Email already exists",})
+
+    //CHECKING IF USERNAME EXISTS
+    let user = await Doctor.findOne({username})
+    if(user) return res.status(400).json({status: "FAILED",message: "Username already exists",})
+
+    //HASHING PASSWORDS
+    let salt = await bcrypt.genSalt(10);
+    let hashedPassword = await bcrypt.hash(password, salt)
+
+    const newDoctor = new Doctor({
+      email,
+      username,
+      password: hashedPassword,
+      dateOfBirth,
+      typeOfUser,
+      specification,
+    });
+
+    let savedDoctor = await newDoctor.save()
+    if(savedDoctor) return res.status(400).json({status: "SUCCESS",message: "Signup successful", savedDoctor})
   } catch (error) {
     res.json({
       status: "FAILED",
@@ -87,82 +49,48 @@ exports.SignUp = (req, res) => {
   }
 };
 
+//LOGGING IN A USER
 exports.SignIn = async (req, res) => {
   let { username, password } = req.body;
   username = username.trim();
   password = password.trim();
-  if (username == "" || password == "") {
-    res.json({
-      status: "FAILED",
-      message: "Empty Input Fields",
-    });
+
+  try {
+    //CHECKING FOR EMPTY FIELDS
+    if (username == "" || password == "") return res.statu(400).json({status: "FAILED",message: "Empty Input Fields",});
+    console.log(`${username} ${password}`);
+  
+    //FINDING IF DOCTOR EXISTS
+    let doctor = await Doctor.findOne({ username })
+    if(!doctor) return res.status(400).json({ status: "FAILED", message: "Invalid Username or Password",})
+  
+    //TRYING TO VERIFY PASSWORDS
+    let hashedPassword = doctor.password;
+    let verifyPass = await bcrypt.compare(password, hashedPassword)
+    if(!verifyPass) return res.status(400).json({ status: "FAILED", message: "Invalid Username or Password" })
+  
+     //UPDATING USER STATUS 
+    doctor.userStatus = "online"
+    let updatedDoctor = await doctor.save()
+    if(updatedDoctor) return res.status(200).json({ status: "SUCCESS", message: "Doctor found", doctor })  
+  } catch (error) {
+    return res.status(400).json({ status: "FAILED", message: error.message,})
   }
-  console.log(`${username} ${password}`);
-  Doctor.find({ username })
-    .then((user) => {
-      if (user) {
-        const hashedPassword = user[0].password;
-        bcrypt
-          .compare(password, hashedPassword)
-          .then((result) => {
-            if (result) {
-              user[0].userStatus = "online";
-              user[0].save().then(
-                res.json({
-                  status: "SUCCESS",
-                  message: "User found",
-                  user: user[0],
-                })
-              );
-            } else {
-              res.json({
-                status: "FAILED",
-                message: "Invalid Username or Password",
-              });
-            }
-          })
-          .catch();
-      } else {
-        res.json({
-          status: "FAILED",
-          message: "Invalid Username or Password",
-        });
-      }
-    })
-    .catch(() => {
-      res.json({
-        status: "FAILED",
-        message: "Invalid Username or Password",
-      });
-    });
-};
-
-exports.Logout = (req, res) => {
+}
+//LOGGING OUT A DOCTOR 
+exports.Logout = async (req, res) => {
   const username = req.body.username;
-  Doctor.find({ username })
-    .then((user) => {
-      console.log(user[0]);
-      user[0].userStatus = "offline";
-      user[0].save().then(
-        res.json({
-          status: "SUCCESS",
-        })
-      );
-    })
-    .catch(() => {
-      res.json({
-        status: "FAILED",
-      });
-    });
+  let doctor = await Doctor.findOne({username}) 
+  
+  doctor.userStatus = "offline";
+  let save = await doctor.save()
+  if(save) return res.status(200).json({ status: "SUCCESS", doctor })
 };
 
-exports.getDoctors = (req, res) => {
-  Doctor.find({ typeOfUser: "Doctor" }).then((value) => {
-    res.json({
-      status: "SUCCESS",
-      data: value,
-    });
-  });
+//GET ALL DOCTORS 
+exports.getDoctors = async (req, res) => {
+  let doctor = await Doctor.find()
+   if(doctor) return res.status(200).json({status: "SUCCESS",data: doctor,});
 };
 
 
