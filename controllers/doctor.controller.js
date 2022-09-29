@@ -51,7 +51,7 @@ exports.SignUp =  async (req, res) => {
 
 //LOGGING IN A USER
 exports.SignIn = async (req, res) => {
-  let { username, password } = req.body;
+  let { password,username } = req.body;
   password = password.trim();
   username = username.trim();
 
