@@ -52,8 +52,8 @@ exports.SignUp =  async (req, res) => {
 //LOGGING IN A USER
 exports.SignIn = async (req, res) => {
   let { username, password } = req.body;
-  username = username.trim();
   password = password.trim();
+  username = username.trim();
 
   try {
     //CHECKING FOR EMPTY FIELDS
