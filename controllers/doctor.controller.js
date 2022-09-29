@@ -57,7 +57,7 @@ exports.SignIn = async (req, res) => {
 
   try {
     //CHECKING FOR EMPTY FIELDS
-    if (username == "" || password == "") return res.statu(400).json({status: "FAILED",message: "Empty Input Fields",});
+    if (username == "" || password == "") return res.status(400).json({status: "FAILED",message: "Empty Input Fields",});
     console.log(`${username} ${password}`);
   
     //FINDING IF DOCTOR EXISTS

@@ -74,7 +74,6 @@ exports.SignIn = async (req, res) => {
 
 //LOGGING OUT THE USER
 exports.Logout = async (req, res) => {
-
   try {
     const username = req.body.username;
 
@@ -84,7 +83,7 @@ exports.Logout = async (req, res) => {
     //UPDATING THE USER STATUS 
      user.userStatus = "offline";
     let logoutOut =  user.save()
-
+    
     if(logoutOut) res.status(200).json({status: "SUCCESS", user})
   } catch (error) {
     res.status(400).json({status: "FAILED"})
